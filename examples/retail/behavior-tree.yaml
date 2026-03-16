@@ -1,0 +1,143 @@
+tree:
+  name: milk_promotion_tree
+  version: 1.0
+  domain: retail
+  description: Behavior tree for store-level milk promotion and display decisions
+
+root:
+
+  sequence:
+
+    - node: receive_event
+      action: load_store_event
+      outputs:
+        - store_id
+        - target_product
+        - timestamp
+
+    - node: load_context
+      action: resolve_store_context
+      outputs:
+        - weather
+        - day_type
+        - inventory_level
+        - competitor_activity
+        - local_event
+
+    - node: generate_signals
+      action: evaluate_store_signals
+      outputs:
+        - waste_risk
+        - stockout_risk
+        - profit_impact
+        - customer_demand_signal
+
+    - node: evaluate_concerns
+      type: parallel
+      children:
+
+        - node: waste_assessment
+          action: check_waste_risk
+
+        - node: stockout_assessment
+          action: check_stockout_risk
+
+        - node: profit_assessment
+          action: check_profit_impact
+
+        - node: operational_assessment
+          action: check_operational_load
+
+    - node: boundary_check
+      type: selector
+      conditions:
+
+        - condition: inventory_unknown
+          action: stop_decision
+          reason: missing_inventory_data
+
+        - condition: supply_delay
+          action: stop_decision
+          reason: unstable_supply
+
+        - condition: promotion_budget_unapproved
+          action: escalate_to_manager
+          reason: budget_not_approved
+
+        - condition: waste_rate_above_threshold
+          action: stop_discount_action
+          reason: waste_control_required
+
+    - node: evaluate_rejected_options
+      action: identify_rejected_options
+      outputs:
+        - rejected_options
+      rules:
+        - if waste_risk == high
+          reject: milk_discount
+          reason: excessive_waste_risk
+
+        - if inventory_level == high
+          reject: extra_order
+          reason: overstock_risk
+
+    - node: decision_contract
+      action: evaluate_contract
+      contract: milk_promotion
+
+    - node: decision_selector
+      type: selector
+      branches:
+
+        - condition:
+            inventory_level: high
+            waste_risk: low
+          action:
+            select_option: milk_discount
+            reason: reduce_excess_inventory
+
+        - condition:
+            waste_risk: high
+          action:
+            select_option: front_display
+            reason: avoid_aggressive_discounting
+
+        - condition:
+            stockout_risk: high
+            customer_demand_signal: high
+          action:
+            select_option: extra_order
+            reason: prevent_stockout
+
+        - default:
+            action:
+              select_option: front_display
+              reason: safe_default_action
+
+    - node: decision_output
+      action: finalize_store_decision
+      outputs:
+        - selected_option
+        - decision_reason
+        - rule_applied
+
+    - node: outcome_targets
+      action: define_outcome_targets
+      outputs:
+        - sales_change
+        - waste_change
+        - inventory_turnover
+        - customer_count_change
+
+    - node: record_decision_trace
+      action: write_decision_ledger
+      record:
+        event: true
+        context: true
+        signals: true
+        concerns: true
+        rejected_options: true
+        decision: true
+        rule_applied: true
+        outcome_targets: true
+        timestamp: true

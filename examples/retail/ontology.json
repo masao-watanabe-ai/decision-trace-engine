@@ -1,0 +1,165 @@
+{
+  "ontology_name": "store_decision_trace",
+  "description": "Ontology for representing store-level decision processes and their relationship to operational outcomes",
+
+  "entities": [
+    "Event",
+    "Context",
+    "Option",
+    "Concern",
+    "RejectedOption",
+    "Decision",
+    "Outcome",
+    "StopCondition",
+    "Evidence",
+    "Claim",
+    "Trace"
+  ],
+
+  "attributes": {
+    "Event": [
+      "event_id",
+      "timestamp",
+      "store_id",
+      "event_type",
+      "source_system",
+      "description"
+    ],
+
+    "Context": [
+      "weather",
+      "day_type",
+      "season",
+      "local_event",
+      "inventory_status",
+      "competitor_activity"
+    ],
+
+    "Option": [
+      "option_id",
+      "option_type",
+      "description",
+      "target_product",
+      "expected_effect"
+    ],
+
+    "Concern": [
+      "concern_type",
+      "description",
+      "severity"
+    ],
+
+    "RejectedOption": [
+      "option_id",
+      "reason",
+      "rejected_timestamp"
+    ],
+
+    "Decision": [
+      "decision_id",
+      "selected_option",
+      "decision_reason",
+      "decided_by",
+      "decision_timestamp"
+    ],
+
+    "Outcome": [
+      "sales_change",
+      "waste_change",
+      "inventory_turnover",
+      "customer_count_change",
+      "gross_margin_change"
+    ],
+
+    "StopCondition": [
+      "condition_type",
+      "description"
+    ],
+
+    "Evidence": [
+      "pos_data_reference",
+      "inventory_data_reference",
+      "weather_data_reference",
+      "store_note_reference"
+    ],
+
+    "Claim": [
+      "claim_statement",
+      "confidence",
+      "evaluation_type"
+    ],
+
+    "Trace": [
+      "contexts",
+      "options",
+      "concerns",
+      "rejected_options",
+      "decision",
+      "outcomes",
+      "stop_conditions"
+    ]
+  },
+
+  "context_examples": [
+    {
+      "weather": "rainy_day",
+      "day_type": "weekday",
+      "season": "summer",
+      "inventory_status": "high_inventory",
+      "competitor_activity": "normal"
+    },
+    {
+      "weather": "sunny_day",
+      "day_type": "holiday",
+      "season": "winter",
+      "inventory_status": "low_inventory",
+      "competitor_activity": "promotion_active"
+    }
+  ],
+
+  "option_examples": [
+    {
+      "option_id": "OPT-001",
+      "option_type": "promotion",
+      "description": "Apply discount to milk products",
+      "target_product": "milk",
+      "expected_effect": "reduce excess inventory"
+    },
+    {
+      "option_id": "OPT-002",
+      "option_type": "display_change",
+      "description": "Move milk products to front display",
+      "target_product": "milk",
+      "expected_effect": "increase customer visibility"
+    },
+    {
+      "option_id": "OPT-003",
+      "option_type": "ordering",
+      "description": "Place an extra order for milk",
+      "target_product": "milk",
+      "expected_effect": "avoid stockout"
+    }
+  ],
+
+  "concern_examples": [
+    "waste_risk",
+    "profit_drop",
+    "stockout",
+    "operational_load"
+  ],
+
+  "outcome_metrics": [
+    "sales_change",
+    "waste_change",
+    "inventory_turnover",
+    "customer_count_change",
+    "gross_margin_change"
+  ],
+
+  "stop_condition_examples": [
+    "inventory_unknown",
+    "supply_delay",
+    "waste_rate_above_threshold",
+    "promotion_budget_unapproved"
+  ]
+}

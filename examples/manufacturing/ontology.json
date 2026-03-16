@@ -1,0 +1,112 @@
+{
+  "ontology_name": "manufacturing_decision_trace",
+  "description": "Ontology for representing engineering decision processes using the Decision Trace Model",
+
+  "entities": [
+    "Event",
+    "Signal",
+    "Option",
+    "Concern",
+    "RiskAssessment",
+    "RejectedReason",
+    "StopCondition",
+    "Decision",
+    "Evidence",
+    "Claim",
+    "Trace"
+  ],
+
+  "attributes": {
+
+    "Event": [
+      "event_id",
+      "timestamp",
+      "source_system",
+      "description"
+    ],
+
+    "Signal": [
+      "model_name",
+      "score",
+      "confidence"
+    ],
+
+    "Option": [
+      "option_id",
+      "description",
+      "material"
+    ],
+
+    "Concern": [
+      "concern_type",
+      "description",
+      "severity"
+    ],
+
+    "RiskAssessment": [
+      "risk_level",
+      "risk_score",
+      "assessment_reason"
+    ],
+
+    "RejectedReason": [
+      "reason_type",
+      "description"
+    ],
+
+    "StopCondition": [
+      "condition_type",
+      "description"
+    ],
+
+    "Decision": [
+      "selected_option",
+      "decision_reason",
+      "decision_timestamp"
+    ],
+
+    "Evidence": [
+      "source_document",
+      "test_result",
+      "measurement"
+    ],
+
+    "Claim": [
+      "claim_statement",
+      "confidence"
+    ],
+
+    "Trace": [
+      "options",
+      "concerns",
+      "risk_assessments",
+      "rejected_options",
+      "stop_conditions"
+    ]
+  },
+
+  "option_examples": [
+    {
+      "option_id": "A",
+      "material": "SUS304",
+      "description": "Standard stainless steel"
+    },
+    {
+      "option_id": "B",
+      "material": "SUS316",
+      "description": "High corrosion resistance steel"
+    }
+  ],
+
+  "concern_examples": [
+    "corrosion_risk",
+    "cost_increase",
+    "procurement_delay"
+  ],
+
+  "risk_levels": [
+    "low",
+    "medium",
+    "high"
+  ]
+}

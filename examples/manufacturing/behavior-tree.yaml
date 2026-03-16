@@ -1,0 +1,61 @@
+tree:
+  name: material_selection_tree
+  version: 1.0
+  description: Behavior tree for evaluating material selection decisions
+
+root:
+
+  sequence:
+
+    - node: receive_event
+      action: load_event_context
+
+    - node: generate_signals
+      action: evaluate_risk_models
+      outputs:
+        - corrosion_risk
+        - cost_increase
+        - procurement_delay
+        - safety_margin
+
+    - node: evaluate_concerns
+      type: parallel
+      children:
+
+        - node: corrosion_assessment
+          action: check_corrosion_risk
+
+        - node: cost_assessment
+          action: check_cost_impact
+
+        - node: procurement_assessment
+          action: check_procurement_delay
+
+    - node: boundary_check
+      type: selector
+      conditions:
+
+        - condition: test_result_missing
+          action: stop_decision
+          reason: missing_test_results
+
+        - condition: safety_standard_unconfirmed
+          action: escalate_to_human
+
+    - node: decision_contract
+      action: evaluate_contract
+      contract: material_selection
+
+    - node: decision_output
+      action: select_material
+
+    - node: record_decision_trace
+      action: write_decision_ledger
+      record:
+
+        event: true
+        signals: true
+        concerns: true
+        decision: true
+        rule_applied: true
+        timestamp: true

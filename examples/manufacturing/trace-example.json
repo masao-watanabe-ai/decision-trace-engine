@@ -1,0 +1,121 @@
+{
+  "trace_id": "mfg-trace-001",
+  "domain": "manufacturing",
+  "contract_id": "material_selection",
+  "contract_version": "1.0",
+  "tree_id": "material_selection_tree",
+  "timestamp": "2026-03-16T10:30:00Z",
+
+  "event": {
+    "event_id": "evt-mfg-1001",
+    "event_type": "material_selection_request",
+    "component_type": "pipe_joint",
+    "operating_environment": "coastal",
+    "temperature": "normal",
+    "source_system": "engineering_review_portal"
+  },
+
+  "signals": {
+    "corrosion_risk": "high",
+    "cost_increase": "medium",
+    "procurement_delay": "low",
+    "safety_margin": "medium",
+    "confidence": 0.87
+  },
+
+  "trace": {
+    "options": [
+      {
+        "option_id": "OPT-A",
+        "name": "SUS304",
+        "description": "Standard stainless steel"
+      },
+      {
+        "option_id": "OPT-B",
+        "name": "SUS316",
+        "description": "High corrosion resistance stainless steel"
+      }
+    ],
+
+    "concerns": [
+      {
+        "concern_type": "corrosion_risk",
+        "description": "High corrosion exposure in coastal environment",
+        "severity": "high"
+      },
+      {
+        "concern_type": "cost_increase",
+        "description": "Material cost increase compared to SUS304",
+        "severity": "medium"
+      },
+      {
+        "concern_type": "procurement_delay",
+        "description": "Potential lead time extension",
+        "severity": "low"
+      }
+    ],
+
+    "risk_assessments": [
+      {
+        "risk_type": "corrosion",
+        "risk_level": "high",
+        "risk_score": 0.91,
+        "assessment_reason": "coastal environment with long-term exposure"
+      },
+      {
+        "risk_type": "cost",
+        "risk_level": "medium",
+        "risk_score": 0.56,
+        "assessment_reason": "material upgrade increases procurement cost"
+      }
+    ],
+
+    "rejected_options": [
+      {
+        "option_id": "OPT-A",
+        "name": "SUS304",
+        "rejected_reason": "insufficient corrosion resistance for coastal environment"
+      }
+    ],
+
+    "stop_conditions_checked": [
+      {
+        "condition": "test_result_missing",
+        "status": false
+      },
+      {
+        "condition": "safety_standard_unconfirmed",
+        "status": false
+      }
+    ]
+  },
+
+  "decision": {
+    "selected_option": "SUS316",
+    "decision_reason": "corrosion protection priority",
+    "rule_applied": "R1",
+    "review_required": false
+  },
+
+  "outcome": {
+    "expected_effect": "improved long-term durability",
+    "expected_cost_impact": "moderate increase",
+    "expected_lead_time_impact": "minimal"
+  },
+
+  "ledger": {
+    "recorded": true,
+    "recorded_at": "2026-03-16T10:30:02Z",
+    "record_fields": [
+      "event",
+      "signals",
+      "options",
+      "concerns",
+      "risk_assessments",
+      "rejected_options",
+      "decision",
+      "outcome",
+      "timestamp"
+    ]
+  }
+}

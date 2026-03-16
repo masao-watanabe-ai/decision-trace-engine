@@ -1,0 +1,125 @@
+{
+  "trace_id": "retail-trace-001",
+  "domain": "retail",
+  "contract_id": "milk_promotion",
+  "contract_version": "1.0",
+  "tree_id": "milk_promotion_tree",
+  "timestamp": "2026-03-16T08:15:00Z",
+
+  "event": {
+    "event_id": "evt-retail-2001",
+    "event_type": "promotion_decision",
+    "store_id": "store-012",
+    "target_product": "milk",
+    "source_system": "store_ops_console"
+  },
+
+  "context": {
+    "weather": "rainy_day",
+    "day_type": "weekday",
+    "season": "summer",
+    "local_event": "none",
+    "inventory_level": "high",
+    "competitor_activity": "normal"
+  },
+
+  "signals": {
+    "waste_risk": "low",
+    "stockout_risk": "low",
+    "profit_impact": "neutral",
+    "customer_demand_signal": "medium",
+    "confidence": 0.81
+  },
+
+  "trace": {
+    "options": [
+      {
+        "option_id": "OPT-001",
+        "name": "milk_discount",
+        "description": "Apply discount to milk products"
+      },
+      {
+        "option_id": "OPT-002",
+        "name": "front_display",
+        "description": "Move milk products to front display"
+      },
+      {
+        "option_id": "OPT-003",
+        "name": "extra_order",
+        "description": "Place additional order for milk"
+      }
+    ],
+
+    "concerns": [
+      {
+        "concern_type": "waste_risk",
+        "description": "Excess milk may be discarded if discount demand is weak",
+        "severity": "low"
+      },
+      {
+        "concern_type": "profit_drop",
+        "description": "Discount may reduce gross margin",
+        "severity": "medium"
+      },
+      {
+        "concern_type": "stockout",
+        "description": "Front display may increase sales velocity unexpectedly",
+        "severity": "low"
+      }
+    ],
+
+    "rejected_options": [
+      {
+        "option_id": "OPT-003",
+        "name": "extra_order",
+        "rejected_reason": "inventory already high"
+      }
+    ],
+
+    "stop_conditions_checked": [
+      {
+        "condition": "inventory_unknown",
+        "status": false
+      },
+      {
+        "condition": "supply_delay",
+        "status": false
+      },
+      {
+        "condition": "promotion_budget_unapproved",
+        "status": false
+      }
+    ]
+  },
+
+  "decision": {
+    "selected_option": "milk_discount",
+    "decision_reason": "reduce excess inventory with limited waste risk",
+    "rule_applied": "R1",
+    "review_required": false
+  },
+
+  "outcome": {
+    "sales_change": "+8.4%",
+    "waste_change": "+1.2%",
+    "inventory_turnover": "+10.1%",
+    "customer_count_change": "+3.0%",
+    "gross_margin_change": "-1.5%"
+  },
+
+  "ledger": {
+    "recorded": true,
+    "recorded_at": "2026-03-16T08:15:03Z",
+    "record_fields": [
+      "event",
+      "context",
+      "signals",
+      "options",
+      "concerns",
+      "rejected_options",
+      "decision",
+      "outcome",
+      "timestamp"
+    ]
+  }
+}

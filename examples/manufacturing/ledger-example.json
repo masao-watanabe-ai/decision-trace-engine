@@ -1,0 +1,181 @@
+{
+  "ledger_record_id": "ledger_mfg_001",
+  "ledger_id": "manufacturing_decision_ledger",
+  "recorded_at": "2026-03-16T09:30:05Z",
+  "record_type": "DECISION_TRACE",
+  "domain": "manufacturing",
+
+  "trace": {
+    "trace_id": "trace_mfg_001",
+    "trace_version": "1.0",
+    "timestamp": "2026-03-16T09:30:00Z",
+    "domain": "manufacturing",
+    "status": "SUCCESS",
+    "event": {
+      "event_id": "design_proposal_102",
+      "type": "material_selection",
+      "timestamp": "2026-03-16T09:29:00Z",
+      "source": "engineering_review_system",
+      "payload": {
+        "component": "heat_exchanger_pipe",
+        "candidate_material": "SUS304"
+      }
+    },
+    "signals": [
+      {
+        "signal_id": "sig_corrosion_001",
+        "name": "corrosion_risk_score",
+        "value": 0.65,
+        "value_type": "number",
+        "source": "corrosion_model",
+        "confidence": 0.84,
+        "timestamp": "2026-03-16T09:29:20Z"
+      },
+      {
+        "signal_id": "sig_cost_001",
+        "name": "cost_index",
+        "value": 1.1,
+        "value_type": "number",
+        "source": "cost_estimator",
+        "timestamp": "2026-03-16T09:29:22Z"
+      }
+    ],
+    "contract_evaluation": {
+      "contract_id": "contract_mfg_material_001",
+      "contract_name": "Material Selection Contract",
+      "contract_version": "1.0",
+      "result": "MATCHED",
+      "rules_evaluated": [
+        {
+          "rule_id": "rule_corrosion_threshold",
+          "expression": "corrosion_risk_score > 0.7",
+          "result": false,
+          "inputs": ["corrosion_risk_score"],
+          "action": "approve_material"
+        }
+      ],
+      "selected_outcome": "APPROVE"
+    },
+    "behavior_tree_execution": {
+      "tree_id": "bt_mfg_material_001",
+      "tree_name": "Material Selection Flow",
+      "tree_version": "1.0",
+      "result": "SUCCESS",
+      "path": [
+        {
+          "node_id": "root_sequence",
+          "node_name": "Root Sequence",
+          "node_type": "Sequence",
+          "status": "SUCCESS",
+          "timestamp": "2026-03-16T09:29:40Z"
+        },
+        {
+          "node_id": "corrosion_check",
+          "node_name": "Corrosion Risk Check",
+          "node_type": "Condition",
+          "status": "SUCCESS",
+          "condition_result": false,
+          "timestamp": "2026-03-16T09:29:41Z"
+        },
+        {
+          "node_id": "approve_material",
+          "node_name": "Approve Material",
+          "node_type": "Action",
+          "status": "SUCCESS",
+          "action_result": "APPROVE",
+          "timestamp": "2026-03-16T09:29:42Z"
+        }
+      ]
+    },
+    "boundary_checks": [
+      {
+        "boundary_id": "boundary_safety_001",
+        "name": "Safety Standard Check",
+        "boundary_type": "compliance_check",
+        "result": "PASS",
+        "reason": "Material satisfies internal safety constraints"
+      },
+      {
+        "boundary_id": "boundary_regulation_001",
+        "name": "Regulation Check",
+        "boundary_type": "policy_guard",
+        "result": "PASS",
+        "reason": "No external regulation conflict detected"
+      }
+    ],
+    "human_review": {
+      "required": false,
+      "review_status": "NOT_REQUIRED"
+    },
+    "decision": {
+      "outcome": "APPROVE",
+      "decision_type": "automated",
+      "reason": "Corrosion risk below escalation threshold",
+      "issued_by": "engine",
+      "confidence": 0.84
+    },
+    "ledger_context": {
+      "ledger_id": "manufacturing_decision_ledger",
+      "recorded_at": "2026-03-16T09:30:05Z",
+      "ledger_backend": "file",
+      "immutable": true,
+      "engine_version": "0.1"
+    }
+  },
+
+  "immutability": {
+    "append_only": true,
+    "immutable": true,
+    "correction_policy": "CORRECT_BY_NEW_RECORD"
+  },
+
+  "integrity": {
+    "hash_algorithm": "SHA-256",
+    "record_hash": "sha256:manufacturing-example-record-hash",
+    "previous_record_hash": "sha256:previous-manufacturing-record-hash"
+  },
+
+  "lineage": {
+    "previous_ledger_record_id": "ledger_mfg_000"
+  },
+
+  "versions": {
+    "trace_schema_version": "1.0",
+    "ledger_schema_version": "1.0",
+    "engine_version": "0.1",
+    "contract_version": "1.0",
+    "behavior_tree_version": "1.0",
+    "ontology_version": "1.0",
+    "model_version": "corrosion_model_v1"
+  },
+
+  "storage": {
+    "backend": "file",
+    "location": "ledger/manufacturing.jsonl",
+    "partition_key": "manufacturing",
+    "retention_policy": "permanent"
+  },
+
+  "access_control": {
+    "classification": "internal",
+    "owner": "engineering_review_team",
+    "allowed_roles": ["engineer", "reviewer", "auditor"],
+    "redaction_required": false
+  },
+
+  "audit_metadata": {
+    "recorded_by": "decision-trace-engine",
+    "recorded_by_type": "engine",
+    "reason": "automatic recording after material selection workflow",
+    "correlation_id": "corr_mfg_001",
+    "request_id": "req_mfg_001"
+  },
+
+  "attachments": [
+    {
+      "type": "report",
+      "path": "reports/material_selection_102.pdf",
+      "description": "Engineering material review report"
+    }
+  ]
+}
