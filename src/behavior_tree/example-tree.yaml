@@ -1,0 +1,24 @@
+tree_id: bt_example_001
+name: Fraud Review Flow
+version: "1.0"
+domain: fraud
+
+root:
+  type: Selector
+  id: root_selector
+  children:
+    - type: Sequence
+      id: fraud_sequence
+      children:
+        - type: Condition
+          id: fraud_check
+          condition:
+            expression: fraud_probability > 0.8
+        - type: Action
+          id: escalate_action
+          action:
+            name: escalate_to_human
+    - type: Action
+      id: approve_action
+      action:
+        name: approve_transaction
