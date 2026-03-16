@@ -49,6 +49,8 @@ root:
       id: no_action_fallback
       action:
         name: no_promotion
+```
+
 Example Usage
 from pathlib import Path
 from src.behavior_tree import parse_behavior_tree, validate_behavior_tree
