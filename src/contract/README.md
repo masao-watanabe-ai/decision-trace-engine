@@ -30,6 +30,8 @@ from src.contract import load_contract
 contract = load_contract("decision-contract.dsl")
 
 print(contract)
+
+```
 This loads the DSL contract and converts it into a structured
 DecisionContract object.
 Purpose
