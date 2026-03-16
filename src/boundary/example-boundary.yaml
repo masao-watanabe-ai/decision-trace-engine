@@ -1,0 +1,18 @@
+boundary_id: boundary_retail_001
+name: Store Promotion Boundary
+version: "1.0"
+boundary_type: policy_guard
+description: Checks whether store promotion decisions remain within policy and budget constraints
+
+rules:
+  - rule_id: rule_budget_limit
+    name: Campaign Budget Limit
+    condition: campaign_budget_remaining < required_budget
+    result: BLOCK
+    description: Block promotion if remaining budget is insufficient
+
+  - rule_id: rule_high_risk_escalation
+    name: High Operational Risk
+    condition: operational_risk_score > 0.85
+    result: ESCALATE
+    description: Escalate to human review when operational risk is high
