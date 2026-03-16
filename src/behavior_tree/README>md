@@ -1,0 +1,51 @@
+# Behavior Tree Reference
+
+This directory contains a minimal reference implementation
+for parsing and validating Behavior Tree definitions used
+in the Decision Trace Model.
+
+The purpose of this code is not to provide a full production
+runtime, but to illustrate how execution structures can be
+represented explicitly and transformed into structured objects.
+
+---
+
+## Supported Node Types
+
+- `Sequence`
+- `Selector`
+- `Condition`
+- `Action`
+
+These node types are sufficient to demonstrate the core
+execution structure of traceable decision workflows.
+
+---
+
+## Example YAML
+
+```yaml
+tree_id: bt_retail_001
+name: Store Promotion Flow
+version: "1.0"
+domain: retail
+
+root:
+  type: Selector
+  id: root_selector
+  children:
+    - type: Sequence
+      id: high_inventory_sequence
+      children:
+        - type: Condition
+          id: inventory_check
+          condition:
+            expression: inventory_risk == "high"
+        - type: Action
+          id: apply_discount_action
+          action:
+            name: apply_discount
+    - type: Action
+      id: no_action_fallback
+      action:
+        name: no_promotion
