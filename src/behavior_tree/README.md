@@ -67,29 +67,3 @@ how execution structures can be parsed into objects
 how decision flow can be separated from application code
 For a full runtime implementation see:
 decision-trace-engine
-
----
-
-# 6. あると良いサンプルファイル
-
-`src/behavior_tree/` にこれも置くと見やすいです。
-
-## `src/behavior_tree/example-tree.yaml`
-
-```yaml
-tree_id: bt_example_001
-name: Fraud Review Flow
-version: "1.0"
-domain: fraud
-
-root:
-  type: Selector
-  id: root_selector
-  children:
-    - type: Sequence
-      id: fraud_sequence
-      children:
-        - type: Condition
-          id: fraud_check
-          condition:
-            expression: fraud_proba
