@@ -1,0 +1,435 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/decision-ledger.schema.json",
+  "title": "Decision Ledger Schema",
+  "description": "Schema for append-only ledger records in the Decision Trace Model. A ledger record preserves a decision trace together with recording context, integrity metadata, and version information.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ledger_record_id",
+    "recorded_at",
+    "trace",
+    "immutability"
+  ],
+  "properties": {
+    "ledger_record_id": {
+      "type": "string",
+      "description": "Unique identifier of the ledger record."
+    },
+    "ledger_id": {
+      "type": "string",
+      "description": "Identifier of the ledger stream, ledger table, or logical ledger namespace."
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when this record was written to the ledger."
+    },
+    "record_type": {
+      "type": "string",
+      "description": "Type of ledger record.",
+      "enum": [
+        "DECISION_TRACE",
+        "TRACE_CORRECTION_REFERENCE",
+        "POLICY_SNAPSHOT",
+        "AUDIT_EVENT"
+      ],
+      "default": "DECISION_TRACE"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Optional domain such as manufacturing, retail, fraud, or orchestration."
+    },
+    "trace": {
+      "$ref": "#/$defs/decisionTrace"
+    },
+    "immutability": {
+      "$ref": "#/$defs/immutability"
+    },
+    "integrity": {
+      "$ref": "#/$defs/integrity"
+    },
+    "lineage": {
+      "$ref": "#/$defs/lineage"
+    },
+    "versions": {
+      "$ref": "#/$defs/versions"
+    },
+    "storage": {
+      "$ref": "#/$defs/storage"
+    },
+    "access_control": {
+      "$ref": "#/$defs/accessControl"
+    },
+    "audit_metadata": {
+      "$ref": "#/$defs/auditMetadata"
+    },
+    "attachments": {
+      "type": "array",
+      "description": "Optional related attachments such as evidence files, reports, logs, or screenshots.",
+      "items": {
+        "$ref": "#/$defs/attachment"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional free-form metadata for provenance, indexing, or internal use.",
+      "additionalProperties": true,
+      "default": {}
+    }
+  },
+  "$defs": {
+    "decisionTrace": {
+      "type": "object",
+      "description": "Embedded decision trace record. This is intentionally compatible with the core Decision Trace structure.",
+      "additionalProperties": true,
+      "required": [
+        "trace_id",
+        "timestamp",
+        "event",
+        "signals",
+        "decision"
+      ],
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "description": "Unique identifier of the decision trace."
+        },
+        "trace_version": {
+          "type": "string",
+          "description": "Version of the decision trace format."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the trace finalization."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Optional domain of the trace."
+        },
+        "status": {
+          "type": "string",
+          "description": "Overall status of the decision execution.",
+          "enum": [
+            "SUCCESS",
+            "FAILURE",
+            "ESCALATED",
+            "PENDING_REVIEW",
+            "BLOCKED"
+          ]
+        },
+        "event": {
+          "type": "object",
+          "description": "Triggering event context.",
+          "additionalProperties": true
+        },
+        "signals": {
+          "type": "array",
+          "description": "Signals used for the decision.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "contract_evaluation": {
+          "type": "object",
+          "description": "Optional contract evaluation result.",
+          "additionalProperties": true
+        },
+        "behavior_tree_execution": {
+          "type": "object",
+          "description": "Optional behavior tree execution result.",
+          "additionalProperties": true
+        },
+        "boundary_checks": {
+          "type": "array",
+          "description": "Optional boundary checks applied during execution.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "human_review": {
+          "type": "object",
+          "description": "Optional human review information.",
+          "additionalProperties": true
+        },
+        "decision": {
+          "type": "object",
+          "description": "Final decision outcome.",
+          "additionalProperties": true,
+          "required": [
+            "outcome"
+          ],
+          "properties": {
+            "outcome": {
+              "type": "string"
+            }
+          }
+        },
+        "ledger_context": {
+          "type": "object",
+          "description": "Optional ledger context embedded in the trace.",
+          "additionalProperties": true
+        },
+        "artifacts": {
+          "type": "array",
+          "description": "Optional related artifacts.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "default": []
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional trace metadata.",
+          "additionalProperties": true,
+          "default": {}
+        }
+      }
+    },
+
+    "immutability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "append_only"
+      ],
+      "properties": {
+        "append_only": {
+          "type": "boolean",
+          "description": "Whether the ledger is append-only for this record. Should normally be true."
+        },
+        "immutable": {
+          "type": "boolean",
+          "description": "Whether this record is intended to be immutable after write.",
+          "default": true
+        },
+        "correction_policy": {
+          "type": "string",
+          "description": "How corrections are handled for ledger history.",
+          "enum": [
+            "NO_UPDATE_ALLOWED",
+            "CORRECT_BY_NEW_RECORD",
+            "EXTERNAL_REFERENCE_ONLY"
+          ],
+          "default": "CORRECT_BY_NEW_RECORD"
+        }
+      }
+    },
+
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hash_algorithm": {
+          "type": "string",
+          "description": "Optional hash algorithm used for content integrity, such as SHA-256."
+        },
+        "record_hash": {
+          "type": "string",
+          "description": "Optional hash of the current record content."
+        },
+        "previous_record_hash": {
+          "type": "string",
+          "description": "Optional hash of the previous ledger record for chained integrity."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Optional cryptographic signature for this record."
+        },
+        "signature_key_id": {
+          "type": "string",
+          "description": "Optional identifier of the signing key."
+        }
+      }
+    },
+
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "previous_ledger_record_id": {
+          "type": "string",
+          "description": "Optional identifier of the previous ledger record."
+        },
+        "parent_trace_id": {
+          "type": "string",
+          "description": "Optional identifier of a parent trace when this record is derived from another trace."
+        },
+        "supersedes_ledger_record_id": {
+          "type": "string",
+          "description": "Optional identifier of a record logically superseded by this one."
+        },
+        "related_record_ids": {
+          "type": "array",
+          "description": "Optional list of related ledger record identifiers.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trace_schema_version": {
+          "type": "string",
+          "description": "Version of the decision trace schema."
+        },
+        "ledger_schema_version": {
+          "type": "string",
+          "description": "Version of the ledger schema."
+        },
+        "engine_version": {
+          "type": "string",
+          "description": "Version of the execution engine."
+        },
+        "contract_version": {
+          "type": "string",
+          "description": "Version of the decision contract used."
+        },
+        "behavior_tree_version": {
+          "type": "string",
+          "description": "Version of the behavior tree used."
+        },
+        "ontology_version": {
+          "type": "string",
+          "description": "Version of the ontology used."
+        },
+        "model_version": {
+          "type": "string",
+          "description": "Optional version of the model or signal provider."
+        }
+      }
+    },
+
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "type": "string",
+          "description": "Ledger storage backend.",
+          "enum": [
+            "file",
+            "postgres",
+            "event_store",
+            "object_store",
+            "blockchain",
+            "other"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Optional logical or physical storage location."
+        },
+        "partition_key": {
+          "type": "string",
+          "description": "Optional partition or stream key."
+        },
+        "retention_policy": {
+          "type": "string",
+          "description": "Optional data retention policy description."
+        }
+      }
+    },
+
+    "accessControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "type": "string",
+          "description": "Optional data classification such as public, internal, confidential, or restricted."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Optional owner of the record."
+        },
+        "allowed_roles": {
+          "type": "array",
+          "description": "Optional roles allowed to access the record.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "redaction_required": {
+          "type": "boolean",
+          "description": "Whether sensitive fields require redaction for some consumers.",
+          "default": false
+        }
+      }
+    },
+
+    "auditMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recorded_by": {
+          "type": "string",
+          "description": "System or actor that wrote the ledger record."
+        },
+        "recorded_by_type": {
+          "type": "string",
+          "description": "Type of recorder such as engine, human, batch_process, or migration.",
+          "enum": [
+            "engine",
+            "human",
+            "batch_process",
+            "migration",
+            "other"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "description": "Optional reason or context for writing the record."
+        },
+        "correlation_id": {
+          "type": "string",
+          "description": "Optional correlation identifier for end-to-end tracing."
+        },
+        "request_id": {
+          "type": "string",
+          "description": "Optional request identifier from the calling system."
+        }
+      }
+    },
+
+    "attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "path"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Attachment type such as evidence, report, screenshot, log, or external_reference."
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative, logical, or URI-like path to the attachment."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the attachment."
+        },
+        "hash": {
+          "type": "string",
+          "description": "Optional content hash of the attachment."
+        }
+      }
+    }
+  }
+}

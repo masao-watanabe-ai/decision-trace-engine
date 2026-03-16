@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/decision-contract.schema.json",
+  "title": "Decision Contract Schema",
+  "description": "Schema for structured decision contract definitions in the Decision Trace Model. This schema represents the normalized or parsed form of a decision contract rather than the raw DSL text.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "name",
+    "version",
+    "rules"
+  ],
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "description": "Unique identifier of the decision contract."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the decision contract."
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the decision contract."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description of the purpose and scope of the contract."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Optional domain such as manufacturing, retail, fraud, or orchestration."
+    },
+    "status": {
+      "type": "string",
+      "description": "Optional lifecycle status of the contract.",
+      "enum": [
+        "draft",
+        "active",
+        "deprecated",
+        "archived"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Signals, fields, or variables referenced by the contract.",
+      "items": {
+        "$ref": "#/$defs/inputRef"
+      },
+      "default": []
+    },
+    "default_outcome": {
+      "type": "string",
+      "description": "Optional default outcome if no rule matches."
+    },
+    "rules": {
+      "type": "array",
+      "description": "Ordered list of decision rules. Rules are typically evaluated in order unless the runtime defines otherwise.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    },
+    "possible_outcomes": {
+      "type": "array",
+      "description": "Optional list of possible outcomes that may be produced by this contract.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for provenance, ownership, documentation, or tooling.",
+      "additionalProperties": true,
+      "default": {}
+    }
+  },
+  "$defs": {
+    "inputRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Input name referenced in conditions, such as fraud_probability or corrosion_risk_score."
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional source of the input, such as signal, event.payload, context, or derived."
+        },
+        "type": {
+          "type": "string",
+          "description": "Optional data type such as string, number, boolean, enum, or object."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the input."
+        }
+      }
+    },
+
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "if",
+        "then"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "description": "Unique identifier of the rule."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional human-readable name of the rule."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the rule intent."
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Optional rule priority. Lower numbers may indicate earlier evaluation, depending on runtime policy."
+        },
+        "if": {
+          "$ref": "#/$defs/condition"
+        },
+        "then": {
+          "$ref": "#/$defs/outcomeBlock"
+        },
+        "else": {
+          "$ref": "#/$defs/outcomeBlock"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Optional tags for grouping or tooling.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+
+    "condition": {
+      "description": "Condition tree used in the IF clause.",
+      "oneOf": [
+        { "$ref": "#/$defs/expressionCondition" },
+        { "$ref": "#/$defs/allCondition" },
+        { "$ref": "#/$defs/anyCondition" },
+        { "$ref": "#/$defs/notCondition" }
+      ]
+    },
+
+    "expressionCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "expression"
+      ],
+      "properties": {
+        "kind": {
+          "const": "expression",
+          "description": "Leaf condition represented as an expression string."
+        },
+        "expression": {
+          "type": "string",
+          "description": "Condition expression such as fraud_probability > 0.8 or inventory_risk == 'high'."
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Optional list of referenced inputs.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+
+    "allCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "conditions"
+      ],
+      "properties": {
+        "kind": {
+          "const": "all",
+          "description": "Logical AND over multiple conditions."
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+
+    "anyCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "conditions"
+      ],
+      "properties": {
+        "kind": {
+          "const": "any",
+          "description": "Logical OR over multiple conditions."
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+
+    "notCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "condition"
+      ],
+      "properties": {
+        "kind": {
+          "const": "not",
+          "description": "Logical negation of a condition."
+        },
+        "condition": {
+          "$ref": "#/$defs/condition"
+        }
+      }
+    },
+
+    "outcomeBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "Action or semantic outcome such as approve_transaction, reject_request, escalate_to_human, or apply_discount."
+        },
+        "outcome": {
+          "type": "string",
+          "description": "Optional normalized outcome label such as APPROVE, REJECT, ESCALATE, APPLY_PROMOTION, or NO_ACTION."
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Optional parameters associated with the action.",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "default": {}
+        },
+        "emit_signals": {
+          "type": "array",
+          "description": "Optional signals emitted as a consequence of the outcome.",
+          "items": {
+            "$ref": "#/$defs/emittedSignal"
+          },
+          "default": []
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional explanation or semantic note."
+        }
+      }
+    },
+
+    "emittedSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the emitted signal."
+        },
+        "value": {
+          "description": "Value of the emitted signal.",
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "description": "Optional type of the emitted signal."
+        }
+      }
+    }
+  }
+}

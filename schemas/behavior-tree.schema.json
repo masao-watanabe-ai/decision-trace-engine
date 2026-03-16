@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/behavior-tree.schema.json",
+  "title": "Decision Trace Model Behavior Tree Schema",
+  "description": "Schema for behavior tree definitions used in the Decision Trace Model. It defines the execution structure of decision workflows using nodes such as Sequence, Selector, Condition, Action, and Decorator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tree_id",
+    "name",
+    "version",
+    "root"
+  ],
+  "properties": {
+    "tree_id": {
+      "type": "string",
+      "description": "Unique identifier of the behavior tree."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the behavior tree."
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the behavior tree definition."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description of the behavior tree."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Optional domain such as manufacturing, retail, fraud, or orchestration."
+    },
+    "root": {
+      "$ref": "#/$defs/node"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for provenance, documentation, or tooling.",
+      "additionalProperties": true,
+      "default": {}
+    }
+  },
+  "$defs": {
+    "node": {
+      "oneOf": [
+        { "$ref": "#/$defs/sequenceNode" },
+        { "$ref": "#/$defs/selectorNode" },
+        { "$ref": "#/$defs/conditionNode" },
+        { "$ref": "#/$defs/actionNode" },
+        { "$ref": "#/$defs/decoratorNode" }
+      ]
+    },
+
+    "commonNodeFields": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the node."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional human-readable node name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the node."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Optional tags for grouping or tooling.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+
+    "sequenceNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "children"
+      ],
+      "properties": {
+        "type": {
+          "const": "Sequence",
+          "description": "Executes child nodes in order. Succeeds only if all children succeed."
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "children": {
+          "type": "array",
+          "description": "Child nodes executed sequentially.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+
+    "selectorNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "children"
+      ],
+      "properties": {
+        "type": {
+          "const": "Selector",
+          "description": "Attempts child nodes in order until one succeeds."
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "children": {
+          "type": "array",
+          "description": "Alternative child nodes used for fallback behavior.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+
+    "conditionNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "condition"
+      ],
+      "properties": {
+        "type": {
+          "const": "Condition",
+          "description": "Evaluates a condition and returns success or failure."
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "condition": {
+          "$ref": "#/$defs/conditionExpression"
+        },
+        "on_success": {
+          "type": "string",
+          "description": "Optional label or semantic hint for what success means."
+        },
+        "on_failure": {
+          "type": "string",
+          "description": "Optional label or semantic hint for what failure means."
+        }
+      }
+    },
+
+    "actionNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "action"
+      ],
+      "properties": {
+        "type": {
+          "const": "Action",
+          "description": "Performs an operation such as approve, reject, escalate, notify, or record."
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "action": {
+          "$ref": "#/$defs/actionDefinition"
+        }
+      }
+    },
+
+    "decoratorNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "decorator",
+        "child"
+      ],
+      "properties": {
+        "type": {
+          "const": "Decorator",
+          "description": "Wraps a single child node and modifies its execution behavior."
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "decorator": {
+          "$ref": "#/$defs/decoratorDefinition"
+        },
+        "child": {
+          "$ref": "#/$defs/node"
+        }
+      }
+    },
+
+    "conditionExpression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression"
+      ],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "Condition expression, for example: fraud_probability > 0.8"
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Optional list of referenced signals, fields, or variables.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional origin of the condition, such as contract, policy, or boundary."
+        }
+      }
+    },
+
+    "actionDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Action name such as approve_transaction, reject_request, escalate_to_human, or apply_promotion."
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Optional action parameters.",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "default": {}
+        },
+        "outcome": {
+          "type": "string",
+          "description": "Optional semantic outcome produced by the action, such as APPROVE, REJECT, or ESCALATE."
+        }
+      }
+    },
+
+    "decoratorDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Inverter",
+            "Retry",
+            "RepeatUntilSuccess",
+            "RepeatUntilFailure",
+            "Timeout",
+            "Guard"
+          ],
+          "description": "Decorator kind that modifies child execution behavior."
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Optional parameters for the decorator, such as retry count or timeout seconds.",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "default": {}
+        }
+      }
+    }
+  }
+}

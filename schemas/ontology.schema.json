@@ -1,0 +1,438 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/ontology.schema.json",
+  "title": "Decision Trace Model Ontology Schema",
+  "description": "Schema for ontology definitions used in the Decision Trace Model. It defines the semantic structure of decision elements such as entities, attributes, relationships, states, signals, contracts, boundaries, and outcomes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ontology_id",
+    "name",
+    "version",
+    "description",
+    "entities"
+  ],
+  "properties": {
+    "ontology_id": {
+      "type": "string",
+      "description": "Unique identifier of the ontology."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the ontology."
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the ontology definition."
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the ontology domain and purpose."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Optional domain name such as manufacturing, retail, finance, or orchestration."
+    },
+    "authors": {
+      "type": "array",
+      "description": "Optional list of authors or maintainers.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "entities": {
+      "type": "array",
+      "description": "Core semantic entities defined in the ontology.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Relationships between entities.",
+      "items": {
+        "$ref": "#/$defs/relationship"
+      },
+      "default": []
+    },
+    "signals": {
+      "type": "array",
+      "description": "Optional semantic definitions of signals used by decision logic.",
+      "items": {
+        "$ref": "#/$defs/signalDefinition"
+      },
+      "default": []
+    },
+    "decision_contracts": {
+      "type": "array",
+      "description": "Optional semantic definitions of decision contracts.",
+      "items": {
+        "$ref": "#/$defs/contractDefinition"
+      },
+      "default": []
+    },
+    "boundaries": {
+      "type": "array",
+      "description": "Optional semantic definitions of boundary concepts.",
+      "items": {
+        "$ref": "#/$defs/boundaryDefinition"
+      },
+      "default": []
+    },
+    "outcomes": {
+      "type": "array",
+      "description": "Optional semantic definitions of possible outcomes.",
+      "items": {
+        "$ref": "#/$defs/outcomeDefinition"
+      },
+      "default": []
+    },
+    "tags": {
+      "type": "array",
+      "description": "Optional tags associated with the ontology.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for provenance or documentation.",
+      "additionalProperties": true,
+      "default": {}
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id",
+        "name",
+        "description",
+        "attributes"
+      ],
+      "properties": {
+        "entity_id": {
+          "type": "string",
+          "description": "Unique identifier of the entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable entity name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the semantic meaning of the entity."
+        },
+        "category": {
+          "type": "string",
+          "description": "Optional category such as event, signal, asset, actor, policy, or decision object."
+        },
+        "attributes": {
+          "type": "array",
+          "description": "Attributes belonging to the entity.",
+          "items": {
+            "$ref": "#/$defs/attribute"
+          },
+          "default": []
+        },
+        "states": {
+          "type": "array",
+          "description": "Optional list of states relevant to the entity.",
+          "items": {
+            "$ref": "#/$defs/state"
+          },
+          "default": []
+        },
+        "examples": {
+          "type": "array",
+          "description": "Optional examples of the entity.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "attribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Attribute name."
+        },
+        "type": {
+          "type": "string",
+          "description": "Attribute type such as string, number, integer, boolean, enum, object, or array."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the attribute."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether this attribute is required in the semantic model.",
+          "default": false
+        },
+        "enum": {
+          "type": "array",
+          "description": "Optional list of allowed values when type is enum.",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean"
+            ]
+          },
+          "default": []
+        },
+        "unit": {
+          "type": "string",
+          "description": "Optional measurement unit."
+        },
+        "examples": {
+          "type": "array",
+          "description": "Optional example values.",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "default": []
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "State name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the state."
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationship_id",
+        "source_entity",
+        "target_entity",
+        "type",
+        "description"
+      ],
+      "properties": {
+        "relationship_id": {
+          "type": "string",
+          "description": "Unique identifier of the relationship."
+        },
+        "source_entity": {
+          "type": "string",
+          "description": "Identifier of the source entity."
+        },
+        "target_entity": {
+          "type": "string",
+          "description": "Identifier of the target entity."
+        },
+        "type": {
+          "type": "string",
+          "description": "Relationship type such as depends_on, belongs_to, triggers, evaluated_by, constrained_by, or recorded_in."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the relationship."
+        },
+        "cardinality": {
+          "type": "string",
+          "description": "Optional relationship cardinality such as one-to-one, one-to-many, or many-to-many."
+        }
+      }
+    },
+    "signalDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_id",
+        "name",
+        "description",
+        "value_type"
+      ],
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "description": "Unique identifier of the signal."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable signal name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the signal meaning."
+        },
+        "value_type": {
+          "type": "string",
+          "description": "Type of the signal value such as number, string, boolean, enum, or object."
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional source of the signal such as model, heuristic, rule engine, or external service."
+        },
+        "range": {
+          "type": "object",
+          "description": "Optional numeric range for the signal.",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        },
+        "examples": {
+          "type": "array",
+          "description": "Optional example values for the signal.",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "default": []
+        }
+      }
+    },
+    "contractDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_id",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "contract_id": {
+          "type": "string",
+          "description": "Unique identifier of the decision contract."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable contract name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the contract purpose."
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Signals or attributes consumed by the contract.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "possible_outcomes": {
+          "type": "array",
+          "description": "Possible outcomes produced by the contract.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "boundaryDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boundary_id",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "boundary_id": {
+          "type": "string",
+          "description": "Unique identifier of the boundary."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable boundary name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the safety, policy, or responsibility boundary."
+        },
+        "boundary_type": {
+          "type": "string",
+          "description": "Optional type such as human_review, policy_guard, compliance_check, or fail_closed."
+        },
+        "trigger_conditions": {
+          "type": "array",
+          "description": "Optional textual descriptions of conditions that activate the boundary.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "outcomeDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome_id",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "outcome_id": {
+          "type": "string",
+          "description": "Unique identifier of the outcome."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the outcome."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the meaning of the outcome."
+        },
+        "category": {
+          "type": "string",
+          "description": "Optional category such as approve, reject, escalate, review, or defer."
+        }
+      }
+    }
+  }
+}

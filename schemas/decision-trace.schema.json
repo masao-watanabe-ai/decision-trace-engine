@@ -1,0 +1,550 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/decision-trace.schema.json",
+  "title": "Decision Trace Schema",
+  "description": "Schema for a complete decision trace in the Decision Trace Model. A decision trace records the event context, generated signals, contract evaluation, behavior tree execution, boundary checks, human review routing, final decision, and ledger context.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "trace_id",
+    "timestamp",
+    "event",
+    "signals",
+    "decision"
+  ],
+  "properties": {
+    "trace_id": {
+      "type": "string",
+      "description": "Unique identifier of the decision trace."
+    },
+    "trace_version": {
+      "type": "string",
+      "description": "Version of the trace format."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp at which the trace was recorded or finalized."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Optional domain such as manufacturing, retail, fraud, or orchestration."
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall execution status of the decision trace.",
+      "enum": [
+        "SUCCESS",
+        "FAILURE",
+        "ESCALATED",
+        "PENDING_REVIEW",
+        "BLOCKED"
+      ]
+    },
+    "event": {
+      "$ref": "#/$defs/event"
+    },
+    "signals": {
+      "type": "array",
+      "description": "Signals generated or supplied for this decision.",
+      "items": {
+        "$ref": "#/$defs/signal"
+      },
+      "default": []
+    },
+    "contract_evaluation": {
+      "$ref": "#/$defs/contractEvaluation"
+    },
+    "behavior_tree_execution": {
+      "$ref": "#/$defs/behaviorTreeExecution"
+    },
+    "boundary_checks": {
+      "type": "array",
+      "description": "Boundary or policy guard checks applied during execution.",
+      "items": {
+        "$ref": "#/$defs/boundaryCheck"
+      },
+      "default": []
+    },
+    "human_review": {
+      "$ref": "#/$defs/humanReview"
+    },
+    "decision": {
+      "$ref": "#/$defs/decision"
+    },
+    "ledger_context": {
+      "$ref": "#/$defs/ledgerContext"
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Optional list of related artifacts such as ontology, contract, tree, report, or evidence files.",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for provenance, debugging, or documentation.",
+      "additionalProperties": true,
+      "default": {}
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "type",
+        "timestamp"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Unique identifier of the triggering event."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of event, such as transaction, store_promotion, or material_selection."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the original event."
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional source system or origin of the event."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Event-specific payload.",
+          "additionalProperties": true,
+          "default": {}
+        }
+      }
+    },
+
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_id",
+        "name",
+        "value"
+      ],
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "description": "Unique identifier of the signal."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable signal name."
+        },
+        "value": {
+          "description": "Signal value.",
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "value_type": {
+          "type": "string",
+          "description": "Optional type of signal value, such as number, string, boolean, enum, or object."
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional source of the signal, such as model, heuristic, external_service, or rule_engine."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Optional confidence score for the signal."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional timestamp when the signal was generated."
+        }
+      }
+    },
+
+    "contractEvaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_id",
+        "result"
+      ],
+      "properties": {
+        "contract_id": {
+          "type": "string",
+          "description": "Identifier of the decision contract."
+        },
+        "contract_name": {
+          "type": "string",
+          "description": "Optional human-readable name of the decision contract."
+        },
+        "contract_version": {
+          "type": "string",
+          "description": "Optional version of the contract."
+        },
+        "result": {
+          "type": "string",
+          "description": "Overall result of contract evaluation.",
+          "enum": [
+            "MATCHED",
+            "NOT_MATCHED",
+            "PARTIAL_MATCH",
+            "ERROR"
+          ]
+        },
+        "rules_evaluated": {
+          "type": "array",
+          "description": "List of evaluated rules.",
+          "items": {
+            "$ref": "#/$defs/evaluatedRule"
+          },
+          "default": []
+        },
+        "selected_outcome": {
+          "type": "string",
+          "description": "Outcome selected by the contract, if any."
+        },
+        "error": {
+          "$ref": "#/$defs/errorInfo"
+        }
+      }
+    },
+
+    "evaluatedRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "expression",
+        "result"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "description": "Unique identifier of the evaluated rule."
+        },
+        "expression": {
+          "type": "string",
+          "description": "Evaluated rule expression."
+        },
+        "result": {
+          "type": "boolean",
+          "description": "Boolean result of the rule evaluation."
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Referenced signals, fields, or variables used in the rule.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "action": {
+          "type": "string",
+          "description": "Optional action or outcome associated with the rule."
+        }
+      }
+    },
+
+    "behaviorTreeExecution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tree_id",
+        "result",
+        "path"
+      ],
+      "properties": {
+        "tree_id": {
+          "type": "string",
+          "description": "Identifier of the executed behavior tree."
+        },
+        "tree_name": {
+          "type": "string",
+          "description": "Optional human-readable name of the behavior tree."
+        },
+        "tree_version": {
+          "type": "string",
+          "description": "Optional version of the behavior tree."
+        },
+        "result": {
+          "type": "string",
+          "description": "Overall execution result of the behavior tree.",
+          "enum": [
+            "SUCCESS",
+            "FAILURE",
+            "RUNNING",
+            "BLOCKED",
+            "ERROR"
+          ]
+        },
+        "path": {
+          "type": "array",
+          "description": "Ordered list of executed nodes.",
+          "items": {
+            "$ref": "#/$defs/executedNode"
+          },
+          "minItems": 1
+        },
+        "error": {
+          "$ref": "#/$defs/errorInfo"
+        }
+      }
+    },
+
+    "executedNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "node_type",
+        "status"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "Identifier of the executed node."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "Optional human-readable node name."
+        },
+        "node_type": {
+          "type": "string",
+          "description": "Type of node such as Sequence, Selector, Condition, Action, or Decorator."
+        },
+        "status": {
+          "type": "string",
+          "description": "Execution status of the node.",
+          "enum": [
+            "SUCCESS",
+            "FAILURE",
+            "RUNNING",
+            "SKIPPED",
+            "ERROR"
+          ]
+        },
+        "condition_result": {
+          "type": "boolean",
+          "description": "Optional boolean result for condition nodes."
+        },
+        "action_result": {
+          "type": "string",
+          "description": "Optional action result or semantic outcome."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional execution timestamp for the node."
+        }
+      }
+    },
+
+    "boundaryCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boundary_id",
+        "name",
+        "result"
+      ],
+      "properties": {
+        "boundary_id": {
+          "type": "string",
+          "description": "Identifier of the boundary or policy guard."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the boundary check."
+        },
+        "boundary_type": {
+          "type": "string",
+          "description": "Optional boundary type such as human_review, policy_guard, compliance_check, or fail_closed."
+        },
+        "result": {
+          "type": "string",
+          "description": "Boundary evaluation result.",
+          "enum": [
+            "PASS",
+            "FAIL",
+            "ESCALATE",
+            "BLOCK"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "description": "Optional explanation of the boundary result."
+        },
+        "triggered_by": {
+          "type": "array",
+          "description": "Optional list of rules, signals, or conditions that triggered the boundary.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+
+    "humanReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether human review is required."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for escalation to human review."
+        },
+        "review_status": {
+          "type": "string",
+          "description": "Status of human review.",
+          "enum": [
+            "NOT_REQUIRED",
+            "PENDING",
+            "APPROVED",
+            "REJECTED",
+            "DEFERRED"
+          ]
+        },
+        "reviewer_id": {
+          "type": "string",
+          "description": "Optional identifier of the reviewer."
+        },
+        "review_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional timestamp of the human review decision."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes from the reviewer."
+        }
+      }
+    },
+
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "description": "Final decision outcome such as APPROVE, REJECT, ESCALATE, APPLY_PROMOTION, or NO_ACTION."
+        },
+        "decision_type": {
+          "type": "string",
+          "description": "Optional decision category such as automated, human_confirmed, overridden, or blocked."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Optional explanation of the final decision."
+        },
+        "issued_by": {
+          "type": "string",
+          "description": "Optional issuer of the final decision such as engine, policy_guard, or human_reviewer."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Optional confidence score associated with the final decision."
+        }
+      }
+    },
+
+    "ledgerContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ledger_id": {
+          "type": "string",
+          "description": "Identifier of the ledger entry."
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the trace was written to the ledger."
+        },
+        "ledger_backend": {
+          "type": "string",
+          "description": "Optional backend such as file, postgres, event_store, or blockchain."
+        },
+        "immutable": {
+          "type": "boolean",
+          "description": "Whether the ledger record is intended to be immutable."
+        },
+        "engine_version": {
+          "type": "string",
+          "description": "Optional version of the execution engine."
+        },
+        "model_version": {
+          "type": "string",
+          "description": "Optional version of the model or signal provider."
+        }
+      }
+    },
+
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "path"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Artifact type such as ontology, contract, behavior_tree, report, or evidence."
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative or logical path to the artifact."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the artifact."
+        }
+      }
+    },
+
+    "errorInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Error code."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message."
+        },
+        "details": {
+          "type": "object",
+          "description": "Optional structured error details.",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
